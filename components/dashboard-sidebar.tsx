@@ -36,8 +36,8 @@ export function DashboardSidebar() {
       const sections = navItems
         .map(item => {
           const el = document.getElementById(item.id)
-          // offsetTop calculates absolute distance from top of document
-          return el ? { id: item.id, top: el.offsetTop } : null
+          // getBoundingClientRect guarantees absolute document position regardless of relative parent offsets
+          return el ? { id: item.id, top: el.getBoundingClientRect().top + window.scrollY } : null
         })
         .filter(Boolean) as { id: string, top: number }[]
 
@@ -71,8 +71,8 @@ export function DashboardSidebar() {
     const el = document.getElementById(id)
     if (el) {
       // Calculate exact mathematical scroll target to avoid scrollIntoView jumpiness
-      // and explicitly account for the 64px sticky header + 24px padding margin.
-      const y = el.getBoundingClientRect().top + window.scrollY - 100
+      // Use 120px offset to aggressively clear the sticky header and give visual breathing room
+      const y = el.getBoundingClientRect().top + window.scrollY - 120
       window.scrollTo({ top: y, behavior: "smooth" })
     }
   }
