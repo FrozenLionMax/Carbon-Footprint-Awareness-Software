@@ -29,43 +29,59 @@ export function DashboardSidebar() {
   const budget = budgetStatus(profile)
 
   useEffect(() => {
-    const handleScroll = () => {
-      // Deep logic: mathematically calculate exact scroll depth against absolute document positions
-      // 300px offset looks deep enough into the page viewport to guarantee intersection even if elements shift
-      const scrollPosition = window.scrollY + 300
-
-      const sections = navItems
+    // Cache the absolute positions of the sections to prevent layout thrashing during scroll
+    let cachedSections: { id: string, top: number }[] = []
+    
+    const updateCache = () => {
+      cachedSections = navItems
         .map(item => {
           const el = document.getElementById(item.id)
-          // getBoundingClientRect guarantees absolute document position regardless of relative parent offsets
           return el ? { id: item.id, top: el.getBoundingClientRect().top + window.scrollY } : null
         })
         .filter(Boolean) as { id: string, top: number }[]
+      cachedSections.sort((a, b) => a.top - b.top)
+    }
 
-      // Sort by vertical position just in case
-      sections.sort((a, b) => a.top - b.top)
+    // Initial cache build (wait briefly for layout/animations to settle)
+    setTimeout(updateCache, 100)
 
-      // The active section is the last one we've scrolled past
+    const handleScroll = () => {
+      if (cachedSections.length === 0) updateCache()
+      
+      const scrollPosition = window.scrollY + 300
       let currentId = navItems[0].id
-      for (const section of sections) {
+      
+      for (const section of cachedSections) {
         if (scrollPosition >= section.top) {
           currentId = section.id
         }
       }
 
-      // Handle edge case: scrolled to absolute bottom of page
       if (window.innerHeight + Math.round(window.scrollY) >= document.body.offsetHeight - 10) {
-        currentId = sections[sections.length - 1].id
+        currentId = cachedSections[cachedSections.length - 1].id
       }
 
-      setActiveSection(currentId)
+      setActiveSection(prev => prev !== currentId ? currentId : prev)
     }
 
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    // Fire once on mount
-    handleScroll()
+    let ticking = false
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll()
+          ticking = false
+        })
+        ticking = true
+      }
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true })
+    window.addEventListener("resize", updateCache, { passive: true })
     
-    return () => window.removeEventListener("scroll", handleScroll)
+    return () => {
+      window.removeEventListener("scroll", onScroll)
+      window.removeEventListener("resize", updateCache)
+    }
   }, [])
 
   const scrollTo = (id: string) => {
