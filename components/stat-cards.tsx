@@ -16,7 +16,8 @@ export function StatCards() {
   const budget = budgetStatus(profile, fy)
   const annualT = totalAnnualKg(profile, fy) / 1000
   const scope = emissionsByScope(profile, fy)
-  const scope3Share = Math.round((scope.scope3 / totalAnnualKg(profile, fy)) * 100)
+  const totalKg = totalAnnualKg(profile, fy)
+  const scope3Share = totalKg > 0 ? Math.round((scope.scope3 / totalKg) * 100) : 0
 
   const cards = [
     {

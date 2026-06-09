@@ -111,7 +111,11 @@ export function DashboardHeader() {
               }
               for (const [key, id] of Object.entries(map)) {
                 if (val.includes(key)) {
-                  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })
+                  const el = document.getElementById(id)
+                  if (el) {
+                    const y = el.getBoundingClientRect().top + window.scrollY - 120
+                    window.scrollTo({ top: y, behavior: "smooth" })
+                  }
                   e.currentTarget.value = ""
                   break
                 }
@@ -182,7 +186,11 @@ export function DashboardHeader() {
           size="icon" 
           onClick={() => {
             hapticAudio.playToggle(true)
-            document.getElementById("anomalies")?.scrollIntoView({ behavior: "smooth", block: "center" })
+            const el = document.getElementById("anomalies")
+            if (el) {
+              const y = el.getBoundingClientRect().top + window.scrollY - 120
+              window.scrollTo({ top: y, behavior: "smooth" })
+            }
           }}
           className="relative size-9 rounded-sm text-muted-foreground hover:bg-muted/50 transition-colors"
         >

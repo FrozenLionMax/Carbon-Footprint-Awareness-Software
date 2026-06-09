@@ -138,9 +138,9 @@ export function budgetForYear(year: number) {
 export function budgetStatus(profile = activityProfile, fy = 2025) {
   const annual = totalAnnualKg(profile, fy)
   const allowance = budgetForYear(2025)
-  const overshootRatio = annual / allowance
+  const overshootRatio = annual > 0 ? annual / allowance : 0
   // Days into the year before the personal budget is exhausted
-  const burnDay = Math.round((allowance / annual) * 365)
+  const burnDay = annual > 0 ? Math.round((allowance / annual) * 365) : 365
   return {
     annualKg: annual,
     allowanceKg: allowance,
@@ -347,7 +347,7 @@ export function projectTenYears(levers: ScenarioLevers = DEFAULT_LEVERS, profile
     })
   }
   const lifetimeSaved = round((baselineAnnual - scenarioAnnual) * 10 / 1000)
-  const reductionPct = round(((baselineAnnual - scenarioAnnual) / baselineAnnual) * 100)
+  const reductionPct = baselineAnnual > 0 ? round(((baselineAnnual - scenarioAnnual) / baselineAnnual) * 100) : 0
   return { 
     years, 
     lifetimeSaved, 
@@ -378,7 +378,7 @@ export function scopeLedger(profile = activityProfile, fy = 2025) {
   return (["scope1", "scope2", "scope3"] as Scope[]).map((sc) => {
     const current = last[sc]
     const previous = prev[sc]
-    const variance = ((current - previous) / previous) * 100
+    const variance = previous > 0 ? ((current - previous) / previous) * 100 : (current > 0 ? 100 : 0)
     return {
       scope: sc,
       label: scopeLabel(sc),

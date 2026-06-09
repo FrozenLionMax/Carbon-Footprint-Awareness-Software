@@ -25,7 +25,8 @@ export function MobileNav() {
     setTimeout(() => {
       const el = document.getElementById(id)
       if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" })
+        const y = el.getBoundingClientRect().top + window.scrollY - 120
+        window.scrollTo({ top: y, behavior: "smooth" })
       }
     }, 150) // small delay to let the sheet close
   }
