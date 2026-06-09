@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils"
 import { useEffect, useState } from "react"
 import { useCarbonContext } from "@/lib/context"
 import { budgetStatus } from "@/lib/dashboard-data"
+import { motion } from "framer-motion"
 
 export const navItems = [
   { label: "Terminal", icon: Activity, code: "001", id: "terminal" },
@@ -86,20 +87,27 @@ export function DashboardSidebar() {
               key={item.label}
               onClick={() => scrollTo(item.id)}
               className={cn(
-                "group flex items-center gap-3 rounded-sm px-3 py-2 text-sm transition-colors",
+                "relative group flex items-center gap-3 rounded-sm px-3 py-2 text-sm transition-colors",
                 isActive
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                  ? "text-sidebar-accent-foreground"
                   : "text-sidebar-foreground/65 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
               )}
             >
+              {isActive && (
+                <motion.div
+                  layoutId="sidebar-active-indicator"
+                  className="absolute inset-0 rounded-sm bg-sidebar-accent border-l-2 border-primary shadow-[inset_0_0_20px_rgba(var(--color-primary-rgb),0.1)]"
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
               <item.icon
                 className={cn(
-                  "size-[18px] transition-transform duration-300 group-hover:translate-x-1",
+                  "relative z-10 size-[18px] transition-transform duration-300 group-hover:translate-x-1",
                   isActive ? "text-sidebar-primary" : "text-sidebar-foreground/50",
                 )}
               />
-              <span className="flex-1 text-left font-medium">{item.label}</span>
-              <span className="font-mono text-[10px] text-sidebar-foreground/35">{item.code}</span>
+              <span className="relative z-10 flex-1 text-left font-medium">{item.label}</span>
+              <span className="relative z-10 font-mono text-[10px] text-sidebar-foreground/35 group-hover:text-sidebar-foreground/50">{item.code}</span>
             </button>
           )
         })}
