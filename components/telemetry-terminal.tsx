@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion"
 
 export function TelemetryTerminal({ isOpen, onComplete }: { isOpen: boolean, onComplete: () => void }) {
   const [logs, setLogs] = useState<string[]>([])
-  const { randomizeProfile } = useCarbonContext()
+  const { fetchLiveTelemetry } = useCarbonContext()
 
   useEffect(() => {
     if (!isOpen) {
@@ -15,49 +15,36 @@ export function TelemetryTerminal({ isOpen, onComplete }: { isOpen: boolean, onC
       return
     }
 
-    const sequence = [
-      "INITIATING SECURE HANDSHAKE...",
-      "AUTHENTICATING VIA OAUTH2 (TOKEN_XXX)...",
-      "ESTABLISHING CONNECTION TO GLOBAL ERP API...",
-      "SYNCING SUPPLY CHAIN INVENTORY...",
-      "PARSING SCOPE 3 EMISSION FACTORS...",
-      "UPDATING SCOPE 1 RAW TELEMETRY...",
-      "INGESTING 14,002 NEW DATA POINTS...",
-      "CALCULATING 1.5°C OVERSHOOT DELTA...",
-      "APPLYING DETERMINISTIC DECAY FUNCTIONS...",
-      "RESOLVING NEW BASELINE MATRIX...",
-      "SYNC COMPLETE. RE-RENDERING DOM."
-    ]
+    const startSync = async () => {
+      setLogs([`[${new Date().toISOString()}] INITIATING SECURE HANDSHAKE...`])
+      await new Promise((r) => setTimeout(r, 600))
+      
+      setLogs(prev => [...prev, `[${new Date().toISOString()}] ESTABLISHING CONNECTION TO UK NATIONAL GRID API...`])
+      await new Promise((r) => setTimeout(r, 800))
 
-    let currentIndex = 0
-    let jitterInterval: NodeJS.Timeout | null = null
-    let logInterval: NodeJS.Timeout | null = null
+      try {
+        setLogs(prev => [...prev, `[${new Date().toISOString()}] FETCHING LIVE CARBON INTENSITY TELEMETRY...`])
+        
+        await fetchLiveTelemetry()
+        
+        setLogs(prev => [...prev, `[${new Date().toISOString()}] DATA ACQUIRED. INJECTING LIVE MULTIPLIERS INTO DETERMINISTIC ENGINE...`])
+        await new Promise((r) => setTimeout(r, 600))
+        
+        setLogs(prev => [...prev, `[${new Date().toISOString()}] RECALCULATING SCOPE 2 BASELINE...`])
+        await new Promise((r) => setTimeout(r, 600))
 
-    // Start jittering the dashboard behind the terminal at a smoother, less aggressive rate
-    jitterInterval = setInterval(() => {
-      randomizeProfile()
-    }, 500) // Changed from 150ms to 500ms to prevent browser lag/jank
-
-    // Stream logs
-    logInterval = setInterval(() => {
-      if (currentIndex < sequence.length) {
-        setLogs(prev => [...prev, `[${new Date().toISOString()}] ${sequence[currentIndex]}`])
-        currentIndex++
-      } else {
-        // Finished
-        clearInterval(jitterInterval!)
-        clearInterval(logInterval!)
-        setTimeout(() => {
-          onComplete()
-        }, 800)
+        setLogs(prev => [...prev, `[${new Date().toISOString()}] SYNC COMPLETE. RE-RENDERING DOM.`])
+      } catch (e) {
+        setLogs(prev => [...prev, `[${new Date().toISOString()}] ERROR: FAILED TO FETCH LIVE TELEMETRY. REVERTING TO STATIC.`])
       }
-    }, 200) // Slightly faster logs but much slower DOM jitter
 
-    return () => {
-      if (jitterInterval) clearInterval(jitterInterval)
-      if (logInterval) clearInterval(logInterval)
+      setTimeout(() => {
+        onComplete()
+      }, 1000)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    startSync()
+
   }, [isOpen])
 
   return (

@@ -8,7 +8,7 @@ import { useDebounce } from "@/hooks/use-debounce"
 import { hapticAudio } from "@/lib/audio"
 
 export function DataEntryPanel() {
-  const { profile, updateProfile, resetProfile } = useCarbonContext()
+  const { profile, updateProfile, resetProfile, isLive, liveIntensity } = useCarbonContext()
   const [tab, setTab] = useState<"emissions" | "esg">("emissions")
 
   return (
@@ -58,6 +58,7 @@ export function DataEntryPanel() {
               value={profile.electricityKwh} 
               min={0} max={20000} step={100}
               onChange={(v) => updateProfile("electricityKwh", v)} 
+              badge={isLive ? `Live: ${liveIntensity?.toFixed(3)} kg/kWh` : undefined}
             />
             <InputField 
               label="Natural Gas (kWh/yr)" 
@@ -147,8 +148,8 @@ export function DataEntryPanel() {
   )
 }
 
-function InputField({ label, value, min, max, step, onChange }: { 
-  label: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void 
+function InputField({ label, value, min, max, step, onChange, badge }: { 
+  label: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void; badge?: string;
 }) {
   const [localValue, setLocalValue] = useState(value)
   const debouncedValue = useDebounce(localValue, 100)
@@ -167,8 +168,15 @@ function InputField({ label, value, min, max, step, onChange }: {
 
   return (
     <div className="flex flex-col gap-2.5">
-      <div className="flex justify-between font-mono text-[10px] uppercase tracking-terminal text-muted-foreground">
-        <span>{label}</span>
+      <div className="flex justify-between font-mono text-[10px] uppercase tracking-terminal text-muted-foreground items-center">
+        <div className="flex items-center gap-1.5">
+          <span>{label}</span>
+          {badge && (
+            <span className="px-1.5 py-0.5 rounded-[2px] bg-accent/20 text-accent border border-accent/30 text-[8px] animate-pulse">
+              {badge}
+            </span>
+          )}
+        </div>
         <span className="text-foreground font-medium tnum">{(localValue ?? 0).toLocaleString()}</span>
       </div>
       <Slider 

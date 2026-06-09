@@ -15,6 +15,9 @@ interface CarbonContextType {
   fy: number
   setFy: (year: number) => void
   randomizeProfile: () => void
+  fetchLiveTelemetry: () => Promise<void>
+  isLive: boolean
+  liveIntensity: number | null
 }
 
 const CarbonContext = createContext<CarbonContextType | undefined>(undefined)
@@ -24,6 +27,8 @@ export function CarbonProvider({ children }: { children: React.ReactNode }) {
   const [levers, setLevers] = useState<ScenarioLevers>(DEFAULT_LEVERS)
   const [fy, setFy] = useState<number>(2025)
   const [isLoaded, setIsLoaded] = useState(false)
+  const [isLive, setIsLive] = useState(false)
+  const [liveIntensity, setLiveIntensity] = useState<number | null>(null)
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -127,8 +132,33 @@ export function CarbonProvider({ children }: { children: React.ReactNode }) {
     setLevers((prev) => ({ ...prev, [key]: !prev[key] }))
   }
 
+  const fetchLiveTelemetry = async () => {
+    try {
+      const res = await fetch("https://api.carbonintensity.org.uk/intensity")
+      const data = await res.json()
+      // API returns grams CO2/kWh, convert to kg/kWh
+      const actualIntensityGrams = data?.data?.[0]?.intensity?.actual
+      if (actualIntensityGrams !== undefined) {
+        const kgIntensity = actualIntensityGrams / 1000
+        
+        // Dynamic import to avoid circular dependency issues and directly call the setter
+        const { setEmissionFactor } = await import("./dashboard-data")
+        setEmissionFactor("electricityKwh", kgIntensity)
+        
+        setLiveIntensity(kgIntensity)
+        setIsLive(true)
+        
+        // Force a re-render by slightly mutating the profile
+        setProfile((prev) => ({ ...prev }))
+      }
+    } catch (error) {
+      console.error("Failed to fetch live telemetry:", error)
+      throw error
+    }
+  }
+
   return (
-    <CarbonContext.Provider value={{ profile, updateProfile, resetProfile, randomizeProfile, levers, toggleLever, fy, setFy }}>
+    <CarbonContext.Provider value={{ profile, updateProfile, resetProfile, randomizeProfile, levers, toggleLever, fy, setFy, fetchLiveTelemetry, isLive, liveIntensity }}>
       {children}
     </CarbonContext.Provider>
   )

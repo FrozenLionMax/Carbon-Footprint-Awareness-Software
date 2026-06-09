@@ -8,7 +8,7 @@
 export type Scope = "scope1" | "scope2" | "scope3"
 
 // --- Emission factors (kgCO2e per activity unit) --------------------------
-export const EMISSION_FACTORS = {
+export let EMISSION_FACTORS = {
   electricityKwh: 0.233, // grid electricity, kg/kWh
   naturalGasKwh: 0.183, // heating, kg/kWh
   petrolLitre: 2.31, // private vehicle, kg/L
@@ -18,7 +18,11 @@ export const EMISSION_FACTORS = {
   dairyKg: 13.5, // kg/kg
   plantKg: 2.0, // kg/kg
   goodsSpendUsd: 0.45, // embodied carbon per $ of goods
-} as const
+}
+
+export function setEmissionFactor(key: keyof typeof EMISSION_FACTORS, value: number) {
+  EMISSION_FACTORS[key] = value
+}
 
 export const ACTIVITY_SCOPE: Record<keyof typeof EMISSION_FACTORS, Scope> = {
   petrolLitre: "scope1",
