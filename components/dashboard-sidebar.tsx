@@ -30,26 +30,42 @@ export function DashboardSidebar() {
   const budget = budgetStatus(profile)
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((e) => e.isIntersecting)
-        if (visible.length > 0) {
-          // Find the topmost visible section
-          const top = visible.reduce((prev, current) => 
-            prev.boundingClientRect.top < current.boundingClientRect.top ? prev : current
-          )
-          setActiveSection(top.target.id)
+    const handleScroll = () => {
+      // Deep logic: mathematically calculate exact scroll depth against absolute document positions
+      const scrollPosition = window.scrollY + 150 // Account for sticky header
+
+      const sections = navItems
+        .map(item => {
+          const el = document.getElementById(item.id)
+          // offsetTop calculates absolute distance from top of document
+          return el ? { id: item.id, top: el.offsetTop } : null
+        })
+        .filter(Boolean) as { id: string, top: number }[]
+
+      // Sort by vertical position just in case
+      sections.sort((a, b) => a.top - b.top)
+
+      // The active section is the last one we've scrolled past
+      let currentId = navItems[0].id
+      for (const section of sections) {
+        if (scrollPosition >= section.top) {
+          currentId = section.id
         }
-      },
-      { rootMargin: "-20% 0px -60% 0px" } // trigger when near top of screen
-    )
+      }
 
-    navItems.forEach((item) => {
-      const el = document.getElementById(item.id)
-      if (el) observer.observe(el)
-    })
+      // Handle edge case: scrolled to absolute bottom of page
+      if (window.innerHeight + Math.round(window.scrollY) >= document.body.offsetHeight - 10) {
+        currentId = sections[sections.length - 1].id
+      }
 
-    return () => observer.disconnect()
+      setActiveSection(currentId)
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    // Fire once on mount
+    handleScroll()
+    
+    return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   const scrollTo = (id: string) => {
