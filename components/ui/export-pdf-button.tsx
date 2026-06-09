@@ -3,20 +3,34 @@
 import { useState } from "react"
 import { Download, Loader2 } from "lucide-react"
 import { hapticAudio } from "@/lib/audio"
+import { useCarbonContext } from "@/lib/context"
+import { PdfReportDocument } from "@/components/pdf-report-document"
 
 export function ExportPdfButton() {
   const [isExporting, setIsExporting] = useState(false)
+  const { profile, fy, isLive } = useCarbonContext()
 
   const handleExport = async () => {
     hapticAudio.playToggle(true)
     setIsExporting(true)
     try {
-      // Use the browser's native print engine to perfectly render modern CSS (oklch, color-mix, blur)
-      // which html2canvas fundamentally does not support.
-      setTimeout(() => {
-        window.print()
-        setIsExporting(false)
-      }, 500)
+      // Dynamically import to avoid server-side rendering issues with react-pdf
+      const { pdf } = await import('@react-pdf/renderer')
+      
+      const blob = await pdf(
+        <PdfReportDocument profile={profile} fy={fy} isLive={isLive} />
+      ).toBlob()
+
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `ESG_Compliance_Report_FY${fy}.pdf`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+      
+      setIsExporting(false)
     } catch (error) {
       console.error("Failed to export PDF:", error)
       setIsExporting(false)
