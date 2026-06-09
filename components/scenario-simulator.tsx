@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/chart"
 import {
   projectTenYears,
+  getInitiatives,
   type ScenarioLevers,
 } from "@/lib/dashboard-data"
 import { cn } from "@/lib/utils"
@@ -39,6 +40,7 @@ const chartConfig = {
 export function ScenarioSimulator() {
   const { profile, levers, toggleLever, fy } = useCarbonContext()
   const result = useMemo(() => projectTenYears(levers, profile, fy), [levers, profile, fy])
+  const initiatives = useMemo(() => getInitiatives(profile, fy), [profile, fy])
 
   const finalYear = result.years[result.years.length - 1]
   const withinBudget = finalYear.scenario <= finalYear.budget
@@ -130,9 +132,25 @@ export function ScenarioSimulator() {
                     <Icon className="size-4" />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-foreground">{lever.label}</p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium text-foreground">{lever.label}</p>
+                    </div>
                     <p className="font-mono text-[10px] text-muted-foreground">{lever.note}</p>
                   </div>
+                  {(() => {
+                    const initiative = initiatives.find(i => i.lever === lever.key)
+                    if (!initiative) return null
+                    const cost = initiative.abatementT * initiative.costPerT
+                    const isSavings = cost <= 0
+                    return (
+                      <span className={cn(
+                        "font-mono text-xs tabular-nums font-semibold mr-2 px-2 py-0.5 rounded-[2px]",
+                        isSavings ? "bg-accent/10 text-accent border border-accent/20" : "bg-destructive/10 text-destructive border border-destructive/20"
+                      )}>
+                        {isSavings ? "-" : "+"}${Math.abs(Math.round(cost)).toLocaleString()}
+                      </span>
+                    )
+                  })()}
                   <span
                     className={cn(
                       "relative h-4 w-7 shrink-0 rounded-full transition-colors",

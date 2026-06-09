@@ -11,7 +11,6 @@ import { Recommendations } from "@/components/recommendations"
 import { ScenarioSimulator } from "@/components/scenario-simulator"
 import { DataEntryPanel } from "@/components/data-entry-panel"
 import { FadeIn } from "@/components/ui/fade-in"
-import { ExportPdfButton } from "@/components/ui/export-pdf-button"
 import { AIBriefingPanel } from "@/components/ai-briefing-panel"
 import { TelemetryTerminal } from "@/components/telemetry-terminal"
 import { useState } from "react"
@@ -46,7 +45,6 @@ export default function Page() {
                     >
                       SYNC TELEMETRY
                     </button>
-                    <ExportPdfButton />
                   </div>
                 </div>
                 <h1 className="text-balance font-sans text-xl font-semibold tracking-tight text-foreground md:text-2xl">

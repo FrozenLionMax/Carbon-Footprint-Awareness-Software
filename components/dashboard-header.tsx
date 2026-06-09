@@ -13,6 +13,7 @@ import {
 import { useCarbonContext } from "@/lib/context"
 import { ambientDrone, hapticAudio } from "@/lib/audio"
 import { MobileNav } from "@/components/mobile-nav"
+import { ExportPdfButton } from "@/components/ui/export-pdf-button"
 
 export function DashboardHeader() {
   const { fy, setFy, profile } = useCarbonContext()
@@ -118,6 +119,9 @@ export function DashboardHeader() {
           </div>
           <span className="tracking-terminal">LIVE</span>
           <span className="tabular-nums tnum text-foreground/80">{clock} IST</span>
+        </div>
+        <div className="hidden sm:block">
+          <ExportPdfButton />
         </div>
         <Button
           variant="outline"

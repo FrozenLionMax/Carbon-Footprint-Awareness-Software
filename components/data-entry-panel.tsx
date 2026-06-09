@@ -59,6 +59,7 @@ export function DataEntryPanel() {
               min={0} max={20000} step={100}
               onChange={(v) => updateProfile("electricityKwh", v)} 
               badge={isLive ? `Live: ${liveIntensity?.toFixed(3)} kg/kWh` : undefined}
+              badgeType={isLive ? (liveIntensity! > 0.7 ? "red" : liveIntensity! > 0.6 ? "yellow" : "green") : "default"}
             />
             <InputField 
               label="Natural Gas (kWh/yr)" 
@@ -148,8 +149,8 @@ export function DataEntryPanel() {
   )
 }
 
-function InputField({ label, value, min, max, step, onChange, badge }: { 
-  label: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void; badge?: string;
+function InputField({ label, value, min, max, step, onChange, badge, badgeType = "default" }: { 
+  label: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void; badge?: string; badgeType?: "default" | "green" | "yellow" | "red"
 }) {
   const [localValue, setLocalValue] = useState(value)
   const debouncedValue = useDebounce(localValue, 100)
@@ -172,12 +173,37 @@ function InputField({ label, value, min, max, step, onChange, badge }: {
         <div className="flex items-center gap-1.5">
           <span>{label}</span>
           {badge && (
-            <span className="px-1.5 py-0.5 rounded-[2px] bg-accent/20 text-accent border border-accent/30 text-[8px] animate-pulse">
+            <span className={`px-1.5 py-0.5 rounded-[2px] border text-[8px] animate-pulse ${
+              badgeType === "green" ? "bg-green-500/20 text-green-400 border-green-500/30 shadow-[0_0_8px_rgba(34,197,94,0.4)]" :
+              badgeType === "yellow" ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 shadow-[0_0_8px_rgba(234,179,8,0.4)]" :
+              badgeType === "red" ? "bg-red-500/20 text-red-400 border-red-500/30 shadow-[0_0_8px_rgba(239,68,68,0.4)]" :
+              "bg-accent/20 text-accent border-accent/30"
+            }`}>
               {badge}
             </span>
           )}
         </div>
-        <span className="text-foreground font-medium tnum">{(localValue ?? 0).toLocaleString()}</span>
+        <input
+          type="number"
+          value={localValue === 0 ? "0" : localValue || ""}
+          min={min}
+          max={max}
+          step={step}
+          onChange={(e) => {
+            const val = e.target.value === "" ? 0 : Number(e.target.value);
+            setLocalValue(val);
+          }}
+          onBlur={(e) => {
+            // Clamp value on blur to ensure it stays within bounds
+            const val = e.target.value === "" ? 0 : Number(e.target.value);
+            const clamped = Math.min(Math.max(val, min), max);
+            setLocalValue(clamped);
+            if (clamped !== val) {
+              onChange(clamped);
+            }
+          }}
+          className="w-20 bg-transparent text-right text-foreground font-medium tnum outline-none border-b border-transparent focus:border-primary/50 transition-colors [&::-webkit-inner-spin-button]:appearance-none"
+        />
       </div>
       <Slider 
         value={[localValue ?? 0]}
