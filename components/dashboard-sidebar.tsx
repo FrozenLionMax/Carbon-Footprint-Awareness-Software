@@ -18,8 +18,7 @@ import { motion } from "framer-motion"
 
 export const navItems = [
   { label: "Terminal", icon: Activity, code: "001", id: "terminal" },
-  { label: "Inventory", icon: Layers, code: "002", id: "inventory" },
-  { label: "Scope Ledger", icon: ScrollText, code: "003", id: "ledger" },
+  { label: "Inventory / Ledger", icon: Layers, code: "002", id: "inventory" },
   { label: "Anomalies", icon: Radar, code: "004", id: "anomalies" },
   { label: "Simulations", icon: GitBranch, code: "005", id: "scenarios" },
 ]

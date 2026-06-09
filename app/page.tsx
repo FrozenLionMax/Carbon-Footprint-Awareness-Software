@@ -64,18 +64,18 @@ export default function Page() {
               </FadeIn>
             </div>
 
-            <FadeIn delay={0.2}>
-              <div id="inventory" className="scroll-mt-24">
+            <div id="inventory" className="flex flex-col gap-4 scroll-mt-24">
+              <FadeIn delay={0.2}>
                 <StatCards />
-              </div>
-            </FadeIn>
+              </FadeIn>
 
-            <FadeIn delay={0.3}>
-              <div id="ledger" className="grid grid-cols-1 gap-4 lg:grid-cols-3 scroll-mt-24">
-                <EmissionsTrendChart />
-                <CategoryBreakdownChart />
-              </div>
-            </FadeIn>
+              <FadeIn delay={0.3}>
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                  <EmissionsTrendChart />
+                  <CategoryBreakdownChart />
+                </div>
+              </FadeIn>
+            </div>
 
             <FadeIn delay={0.4}>
               <div id="anomalies" className="grid grid-cols-1 gap-4 lg:grid-cols-3 scroll-mt-24">
