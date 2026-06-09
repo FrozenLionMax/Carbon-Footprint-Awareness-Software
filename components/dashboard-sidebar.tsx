@@ -31,7 +31,8 @@ export function DashboardSidebar() {
   useEffect(() => {
     const handleScroll = () => {
       // Deep logic: mathematically calculate exact scroll depth against absolute document positions
-      const scrollPosition = window.scrollY + 150 // Account for sticky header
+      // 300px offset looks deep enough into the page viewport to guarantee intersection even if elements shift
+      const scrollPosition = window.scrollY + 300
 
       const sections = navItems
         .map(item => {
@@ -68,6 +69,7 @@ export function DashboardSidebar() {
   }, [])
 
   const scrollTo = (id: string) => {
+    setActiveSection(id) // Immediately update UI for instant feedback
     const el = document.getElementById(id)
     if (el) {
       // Calculate exact mathematical scroll target to avoid scrollIntoView jumpiness
