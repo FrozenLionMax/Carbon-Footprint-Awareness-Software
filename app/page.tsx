@@ -29,7 +29,7 @@ export default function Page() {
         <DashboardHeader />
 
         <main className="flex-1 px-4 py-6 md:px-6">
-          <div id="dashboard-content" className="mx-auto flex max-w-7xl flex-col gap-4">
+          <div id="terminal" className="mx-auto flex max-w-7xl flex-col gap-4 scroll-mt-24">
             <FadeIn delay={0}>
               <div className="flex flex-col gap-1">
                 <div className="flex items-center justify-between">
@@ -65,29 +65,29 @@ export default function Page() {
             </FadeIn>
 
             <FadeIn delay={0.2}>
-              <div id="inventory">
+              <div id="inventory" className="scroll-mt-24">
                 <StatCards />
               </div>
             </FadeIn>
 
             <FadeIn delay={0.3}>
-              <div id="ledger" className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+              <div id="ledger" className="grid grid-cols-1 gap-4 lg:grid-cols-3 scroll-mt-24">
                 <EmissionsTrendChart />
                 <CategoryBreakdownChart />
               </div>
             </FadeIn>
 
             <FadeIn delay={0.4}>
-              <div id="anomalies" className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+              <div id="anomalies" className="grid grid-cols-1 gap-4 lg:grid-cols-3 scroll-mt-24">
                 <ConsultantFeed />
                 <ReductionTargets />
               </div>
             </FadeIn>
 
             <FadeIn delay={0.5}>
-              <div id="scenarios" className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+              <div id="scenarios" className="grid grid-cols-1 gap-4 lg:grid-cols-3 scroll-mt-24">
                 <ScenarioSimulator />
-                <div id="abatement">
+                <div id="abatement" className="scroll-mt-24">
                   <Recommendations />
                 </div>
               </div>

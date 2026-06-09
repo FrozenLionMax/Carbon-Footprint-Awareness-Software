@@ -20,11 +20,14 @@ export function Recommendations() {
   return (
     <div className="flex h-full flex-col rounded-sm border border-white/5 bg-card/30 backdrop-blur-xl shadow-2xl shadow-black/40 lg:col-span-2">
       <div className="flex flex-row items-start justify-between border-b border-white/10 px-5 py-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <FlaskConical className="size-4 text-primary" />
+        <div className="flex items-center gap-2">
+          <FlaskConical className="size-4 text-primary" />
+          <div>
+            <span className="font-mono text-[10px] uppercase tracking-terminal text-muted-foreground">
+              MODULE 006 ·
+            </span>
             <h2 className="font-mono text-sm font-semibold tracking-wide text-foreground">
-              MARGINAL ABATEMENT COST CURVE
+              MARGINAL ABATEMENT STRATEGY
             </h2>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">

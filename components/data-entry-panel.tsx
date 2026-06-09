@@ -18,7 +18,7 @@ export function DataEntryPanel() {
           <div className="flex items-center gap-2">
             <Settings2 className="size-4 text-primary" />
             <h2 className="font-mono text-sm font-semibold tracking-wide text-foreground">
-              INPUT PARAMETERS
+              MODULE 001 · TERMINAL PARAMETERS
             </h2>
           </div>
           <div className="hidden h-4 w-px bg-border sm:block" />

@@ -19,10 +19,14 @@ export function ConsultantFeed() {
     <div className="flex flex-col rounded-sm border border-white/5 bg-card/30 backdrop-blur-xl shadow-2xl shadow-black/40 lg:col-span-2">
       <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
         <div className="flex items-center gap-2">
-          <Cpu className="size-4 text-primary" />
+          <div className="flex items-center gap-2">
+          <span className="font-mono text-[10px] uppercase tracking-terminal text-muted-foreground">
+            MODULE 004 ·
+          </span>
           <h2 className="font-mono text-sm font-semibold tracking-wide text-foreground">
             ECO·ASSISTANT — ANOMALY ENGINE
           </h2>
+        </div>
         </div>
         <span className="font-mono text-[10px] uppercase tracking-terminal text-muted-foreground">
           z-score · 3mo window

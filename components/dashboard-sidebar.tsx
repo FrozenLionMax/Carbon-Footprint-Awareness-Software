@@ -15,12 +15,13 @@ import { useEffect, useState } from "react"
 import { useCarbonContext } from "@/lib/context"
 import { budgetStatus } from "@/lib/dashboard-data"
 
-const navItems = [
+export const navItems = [
   { label: "Terminal", icon: Activity, code: "001", id: "terminal" },
   { label: "Inventory", icon: Layers, code: "002", id: "inventory" },
-  { label: "Anomalies", icon: Radar, code: "003", id: "anomalies" },
-  { label: "Scenarios", icon: GitBranch, code: "004", id: "scenarios" },
-  { label: "Abatement", icon: FlaskConical, code: "005", id: "abatement" },
+  { label: "Scope Ledger", icon: ScrollText, code: "003", id: "ledger" },
+  { label: "Anomalies", icon: Radar, code: "004", id: "anomalies" },
+  { label: "Scenarios", icon: GitBranch, code: "005", id: "scenarios" },
+  { label: "Abatement", icon: FlaskConical, code: "006", id: "abatement" },
 ]
 
 export function DashboardSidebar() {

@@ -32,7 +32,7 @@ export function EmissionsTrendChart() {
         <div>
           <div className="flex items-center gap-2">
             <span className="font-mono text-[10px] uppercase tracking-terminal text-muted-foreground">
-              MODULE 001 ·
+              MODULE 003 ·
             </span>
             <h2 className="font-mono text-sm font-semibold tracking-wide text-foreground">
               EMISSION TIMESERIES

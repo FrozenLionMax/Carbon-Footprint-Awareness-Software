@@ -4,8 +4,15 @@ import { useEffect, useState } from "react"
 import { Search, Bell, ChevronDown, Circle, CalendarClock, Headphones } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { useCarbonContext } from "@/lib/context"
 import { ambientDrone, hapticAudio } from "@/lib/audio"
+import { MobileNav } from "@/components/mobile-nav"
 
 export function DashboardHeader() {
   const { fy, setFy, profile } = useCarbonContext()
@@ -56,7 +63,7 @@ export function DashboardHeader() {
           hour: "2-digit",
           minute: "2-digit",
           second: "2-digit",
-          timeZone: "UTC",
+          timeZone: "Asia/Kolkata",
         }),
       )
     tick()
@@ -68,6 +75,7 @@ export function DashboardHeader() {
     <header className="relative sticky top-0 z-50 flex h-16 items-center gap-4 border-b border-white/5 bg-background/60 px-4 backdrop-blur-2xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] md:px-6">
       <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-70 shadow-[0_0_12px_var(--color-primary)] animate-[laserX_4s_ease-in-out_infinite]" style={{ backgroundSize: "200% 100%", backgroundRepeat: "no-repeat" }} />
       <div className="flex items-center gap-2 lg:hidden">
+        <MobileNav />
         <div className="flex size-7 items-center justify-center rounded-sm bg-primary text-primary-foreground text-sm font-bold font-mono">
           C
         </div>
@@ -109,7 +117,7 @@ export function DashboardHeader() {
             <Circle className="size-2 fill-accent text-accent" />
           </div>
           <span className="tracking-terminal">LIVE</span>
-          <span className="tabular-nums tnum text-foreground/80">{clock} UTC</span>
+          <span className="tabular-nums tnum text-foreground/80">{clock} IST</span>
         </div>
         <Button
           variant="outline"
@@ -123,20 +131,34 @@ export function DashboardHeader() {
           <Headphones className="size-3.5" />
           {droneEnabled ? 'DRONE: ON' : 'DRONE: OFF'}
         </Button>
-        <Button 
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            hapticAudio.playToggle(true)
-            if (fy === 2025) setFy(2024)
-            else if (fy === 2024) setFy(2023)
-            else setFy(2025)
-          }}
-          className="hidden h-9 gap-2 rounded-sm bg-card font-mono text-xs font-normal text-foreground sm:flex active:scale-95 transition-transform"
-        >
-          <CalendarClock className="size-3.5 text-muted-foreground" />
-          FY{fy}
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              variant="outline"
+              size="sm"
+              onClick={() => hapticAudio.playToggle(true)}
+              className="hidden h-9 gap-2 rounded-sm bg-card font-mono text-xs font-normal text-foreground sm:flex transition-transform data-[state=open]:bg-muted/50"
+            >
+              <CalendarClock className="size-3.5 text-muted-foreground" />
+              FY{fy}
+              <ChevronDown className="size-3 text-muted-foreground ml-1" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-32 rounded-sm font-mono text-xs">
+            {[2025, 2024, 2023].map((year) => (
+              <DropdownMenuItem 
+                key={year}
+                onClick={() => {
+                  hapticAudio.playTick()
+                  setFy(year)
+                }}
+                className={`cursor-pointer rounded-sm ${fy === year ? "bg-primary/10 text-primary font-bold" : ""}`}
+              >
+                FY{year}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Button 
           variant="ghost" 
           size="icon" 

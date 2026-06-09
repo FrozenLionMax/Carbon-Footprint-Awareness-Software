@@ -39,7 +39,7 @@ export function CategoryBreakdownChart() {
       <div className="border-b border-white/10 px-5 py-4">
         <div className="flex items-center gap-2">
           <span className="font-mono text-[10px] uppercase tracking-terminal text-muted-foreground">
-            MODULE 002 ·
+            MODULE 003 ·
           </span>
           <h2 className="font-mono text-sm font-semibold tracking-wide text-foreground">
             SCOPE LEDGER

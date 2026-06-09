@@ -48,9 +48,11 @@ export function ScenarioSimulator() {
       <div className="flex flex-row items-start justify-between border-b border-white/10 px-5 py-4">
         <div>
           <div className="flex items-center gap-2">
-            <Sparkles className="size-4 text-primary" />
+            <span className="font-mono text-[10px] uppercase tracking-terminal text-muted-foreground">
+              MODULE 005 ·
+            </span>
             <h2 className="font-mono text-sm font-semibold tracking-wide text-foreground">
-              DECARBONIZATION PATHWAY SIMULATOR
+              PATHWAY SIMULATOR
             </h2>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
