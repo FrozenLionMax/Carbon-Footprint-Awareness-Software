@@ -45,10 +45,10 @@ The software calculates a composite letter grade (A+ through F) based on a weigh
 
 ## 🧮 Architecture & Mathematical Models
 
-The application does not use a database backend; instead, it relies on a **Deterministic React State Engine** (`lib/dashboard-data.ts`). 
+The application relies on a **Deterministic React State Engine** (`lib/dashboard-data.ts`) with deep structural logic.
 
 ### Emission Factor Cascades
-Every user input (e.g., `flightLongHaulKm`) is instantly multiplied by a predefined environmental factor (e.g., `0.15 kg/km`). Because the entire UI subscribes to this React Context, dragging a slider forces a synchronous recalculation of the entire dashboard in real-time.
+Every user input (e.g., `flightLongHaulKm`) is instantly multiplied by a predefined environmental factor (e.g., `0.15 kg/km`). Because the entire UI subscribes to this React Context, dragging a slider forces a synchronous recalculation of the entire dashboard in real-time. The math engine is heavily defended against zero-division errors, safely processing total parameter wipes gracefully.
 
 ### Z-Score Anomaly Detection
 The **Eco·Assistant Anomaly Engine** does not just flag high numbers. It uses a trailing 3-month variance check (Z-scoring) against a moving baseline. If a specific activity (like Grid Electricity) spikes more than 2 standard deviations above the expected curve, the engine generates a `CRITICAL` alert and maps a specific abatement policy recommendation to resolve it.
@@ -57,18 +57,20 @@ The **Eco·Assistant Anomaly Engine** does not just flag high numbers. It uses a
 The **Pathway Simulator** uses a compounding year-over-year reduction matrix. When you engage a policy lever (e.g., "Electric Vehicle Fleet"):
 1.  The base `petrolLitre` multiplier is slashed by 85%.
 2.  The `electricityKwh` multiplier is increased to account for EV charging.
-3.  The model projects this new configuration out 10 years, factoring in grid-decarbonization curves, to show total cumulative lifetime metric tons saved.
+3.  The model projects this new configuration out 10 years, factoring in grid-decarbonization curves, to show total cumulative lifetime metric tons saved alongside Capital Expenditure (CapEx) tracking.
 
 ---
 
 ## ⚡ Features & UI
 
 This application pushes the extreme limits of front-end engineering with obsessive micro-interactions:
-- **Cinematic Glassmorphism:** Deep frosted panels (`backdrop-blur-2xl`) with dynamic drop shadows.
+
+- **AI Executive Briefing:** A floating assistant terminal that evaluates your exact, live data payload to generate deterministic English-language briefings via a typewriter effect with haptic feedback.
+- **Executive PDF Exporting:** Utilizes `@react-pdf/renderer` to silently compile your live dashboard data and dynamic charts into a beautifully formatted, downloadable PDF compliance report.
+- **Cinematic Bio-Feedback Glassmorphism:** Deep frosted panels (`backdrop-blur-2xl`) that physically react to your inputs. If you exceed the carbon budget, the entire application interface flushes a pulsating Critical Red.
+- **Universal Math-Offset Navigation:** Instead of basic sticky scrolling, the app uses a proprietary background engine to cache exact absolute document coordinates. The laser-glowing sidebar, global search bar, and mobile sheet all navigate perfectly at 60 FPS without layout thrashing.
 - **Physics-Based Interactions:** Heavy mechanical levers (`active:scale-[0.98]`), spring-loaded tactile sidebars, and 3D hover levitation on metric cards with sweeping light reflections.
-- **Cyber-Terminal Aesthetics:** A continuous, panning geometric matrix grid, a 4-second looping neon laser ingestion bar, and CRT scanlines traversing the UI.
-- **Dynamic Charting:** Recharts integration featuring an oscilloscope-style initial draw animation (`2000ms ease-in-out`), high-tech dashed tracking crosshairs, and liquid gradient fills.
-- **Interactive Data:** The Scope Ledger features horizontal filling progress bars and rows that physically bump to the right when hovered.
+- **Haptic Audio Engineering:** Features bespoke UI tick sounds and an optional ambient "Drone" mode to keep you focused.
 
 ---
 
@@ -76,8 +78,9 @@ This application pushes the extreme limits of front-end engineering with obsessi
 
 - **Framework:** Next.js (App Router) + React 18
 - **Styling:** Tailwind CSS + Custom CSS Keyframe Animations
-- **Components:** Shadcn UI + Lucide Icons
+- **Accessibility Engine:** Base UI (`@base-ui-components`) + Shadcn
 - **Data Visualization:** Recharts
+- **Exporting:** `@react-pdf/renderer`
 - **Font:** Inter (Sans) + JetBrains Mono (Terminal)
 
 ---
