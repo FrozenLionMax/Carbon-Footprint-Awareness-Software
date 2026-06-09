@@ -73,8 +73,14 @@ export function ReductionTargets() {
       </div>
 
       <div className="mt-auto grid grid-cols-2 gap-px border-t border-border bg-border">
-        {factors.map((f) => (
-          <div key={f.label} className="flex items-center justify-between bg-card px-5 py-2.5">
+        {factors.map((f, i) => (
+          <div 
+            key={f.label} 
+            className={cn(
+              "flex items-center justify-between bg-card px-5 py-2.5",
+              i === factors.length - 1 && factors.length % 2 !== 0 ? "col-span-2" : ""
+            )}
+          >
             <span className="font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
               {f.label}
             </span>
