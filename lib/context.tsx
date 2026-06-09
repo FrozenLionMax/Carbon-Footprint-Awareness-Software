@@ -137,8 +137,10 @@ export function CarbonProvider({ children }: { children: React.ReactNode }) {
       const res = await fetch("https://api.carbonintensity.org.uk/intensity")
       const data = await res.json()
       // API returns grams CO2/kWh, convert to kg/kWh
-      const actualIntensityGrams = data?.data?.[0]?.intensity?.actual
-      if (actualIntensityGrams !== undefined) {
+      const rawActual = data?.data?.[0]?.intensity?.actual ?? data?.data?.[0]?.intensity?.forecast
+      const actualIntensityGrams = Number(rawActual)
+      
+      if (!isNaN(actualIntensityGrams) && actualIntensityGrams > 0) {
         const kgIntensity = actualIntensityGrams / 1000
         
         // Dynamic import to avoid circular dependency issues and directly call the setter
