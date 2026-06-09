@@ -154,17 +154,19 @@ export function DashboardHeader() {
           {droneEnabled ? 'DRONE: ON' : 'DRONE: OFF'}
         </Button>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button 
-              variant="outline"
-              size="sm"
-              onClick={() => hapticAudio.playToggle(true)}
-              className="hidden h-9 gap-2 rounded-sm bg-card font-mono text-xs font-normal text-foreground sm:flex transition-transform data-[state=open]:bg-muted/50"
-            >
-              <CalendarClock className="size-3.5 text-muted-foreground" />
-              FY{fy}
-              <ChevronDown className="size-3 text-muted-foreground ml-1" />
-            </Button>
+          <DropdownMenuTrigger 
+            render={
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => hapticAudio.playToggle(true)}
+                className="hidden h-9 gap-2 rounded-sm bg-card font-mono text-xs font-normal text-foreground sm:flex transition-transform data-[state=open]:bg-muted/50"
+              />
+            }
+          >
+            <CalendarClock className="size-3.5 text-muted-foreground" />
+            FY{fy}
+            <ChevronDown className="size-3 text-muted-foreground ml-1" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-32 rounded-sm font-mono text-xs">
             {[2025, 2024, 2023].map((year) => (

@@ -33,11 +33,9 @@ export function MobileNav() {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="lg:hidden shrink-0">
-          <Menu className="size-5" />
-          <span className="sr-only">Toggle navigation menu</span>
-        </Button>
+      <SheetTrigger render={<Button variant="ghost" size="icon" className="lg:hidden shrink-0" />}>
+        <Menu className="size-5" />
+        <span className="sr-only">Toggle navigation menu</span>
       </SheetTrigger>
       <SheetContent side="left" className="w-[85vw] sm:w-[350px] flex flex-col bg-sidebar border-sidebar-border p-0 gap-0">
         <SheetHeader className="sr-only">
