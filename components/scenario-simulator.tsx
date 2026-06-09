@@ -145,9 +145,9 @@ export function ScenarioSimulator() {
                     return (
                       <span className={cn(
                         "font-mono text-xs tabular-nums font-semibold mr-2 px-2 py-0.5 rounded-[2px]",
-                        isSavings ? "bg-accent/10 text-accent border border-accent/20" : "bg-destructive/10 text-destructive border border-destructive/20"
+                        cost === 0 ? "bg-muted text-muted-foreground border border-border" : isSavings ? "bg-accent/10 text-accent border border-accent/20" : "bg-destructive/10 text-destructive border border-destructive/20"
                       )}>
-                        {isSavings ? "-" : "+"}${Math.abs(Math.round(cost)).toLocaleString()}
+                        {cost === 0 ? "" : isSavings ? "-" : "+"}${Math.abs(Math.round(cost)).toLocaleString()}
                       </span>
                     )
                   })()}

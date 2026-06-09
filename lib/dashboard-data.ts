@@ -362,9 +362,9 @@ export function projectTenYears(levers: ScenarioLevers = DEFAULT_LEVERS, profile
 export function getInitiatives(profile = activityProfile, fy = 2025) {
   return [
     { id: "renew", label: "100% renewable electricity tariff", lever: "renewableSwitch", abatementKg: emissionsByScope(profile, fy).scope2, costPerT: 18, effort: "Low", scope: "scope2" as Scope },
-    { id: "diet", label: "Plant-forward diet (−45% animal proteins)", lever: "plantForward", abatementKg: 0.45 * (profile.redMeatKg * EMISSION_FACTORS.redMeatKg + profile.dairyKg * EMISSION_FACTORS.dairyKg), costPerT: -12, effort: "Medium", scope: "scope3" as Scope },
-    { id: "ground", label: "Replace short-haul flights with rail", lever: "groundTravel", abatementKg: 0.7 * profile.flightShortHaulKm * EMISSION_FACTORS.flightShortHaulKm, costPerT: 45, effort: "Medium", scope: "scope3" as Scope },
-    { id: "ev", label: "Transition to electric vehicle", lever: "fleetEv", abatementKg: 0.85 * profile.petrolLitre * EMISSION_FACTORS.petrolLitre, costPerT: 120, effort: "High", scope: "scope1" as Scope },
+    { id: "diet", label: "Plant-forward diet (−45% animal proteins)", lever: "plantForward", abatementKg: 0.45 * (safeNumber(profile.redMeatKg) * EMISSION_FACTORS.redMeatKg + safeNumber(profile.dairyKg) * EMISSION_FACTORS.dairyKg), costPerT: -12, effort: "Medium", scope: "scope3" as Scope },
+    { id: "ground", label: "Replace short-haul flights with rail", lever: "groundTravel", abatementKg: 0.7 * safeNumber(profile.flightShortHaulKm) * EMISSION_FACTORS.flightShortHaulKm, costPerT: 45, effort: "Medium", scope: "scope3" as Scope },
+    { id: "ev", label: "Transition to electric vehicle", lever: "fleetEv", abatementKg: 0.85 * safeNumber(profile.petrolLitre) * EMISSION_FACTORS.petrolLitre, costPerT: 120, effort: "High", scope: "scope1" as Scope },
   ]
     .map((i) => ({ ...i, abatementT: round(i.abatementKg / 1000, 2) }))
     .sort((a, b) => a.costPerT - b.costPerT)
