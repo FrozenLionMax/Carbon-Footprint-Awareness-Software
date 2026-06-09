@@ -28,39 +28,41 @@ export default function Page() {
         <DashboardHeader />
 
         <main className="flex-1 px-4 py-6 md:px-6">
-          <div id="terminal" className="mx-auto flex max-w-7xl flex-col gap-4 scroll-mt-24">
-            <FadeIn delay={0}>
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-terminal text-muted-foreground">
-                    <span className="text-primary">//</span>
-                    <span>Terminal</span>
-                    <span className="text-muted-foreground/40">/</span>
-                    <span className="text-foreground/70">Overview</span>
+          <div className="mx-auto flex max-w-7xl flex-col gap-4">
+            <div id="terminal" className="scroll-mt-24">
+              <FadeIn delay={0}>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-terminal text-muted-foreground">
+                      <span className="text-primary">//</span>
+                      <span>Terminal</span>
+                      <span className="text-muted-foreground/40">/</span>
+                      <span className="text-foreground/70">Overview</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => setIsSyncing(true)}
+                        className="rounded-md border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-semibold tracking-wide text-primary backdrop-blur-md transition-all hover:bg-primary/20"
+                      >
+                        SYNC TELEMETRY
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={() => setIsSyncing(true)}
-                      className="rounded-md border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-semibold tracking-wide text-primary backdrop-blur-md transition-all hover:bg-primary/20"
-                    >
-                      SYNC TELEMETRY
-                    </button>
-                  </div>
+                  <h1 className="text-balance font-sans text-xl font-semibold tracking-tight text-foreground md:text-2xl">
+                    Personal ESG Intelligence — Deterministic Carbon Ledger
+                  </h1>
+                  <p className="max-w-2xl text-pretty text-sm leading-relaxed text-muted-foreground">
+                    Every figure below is derived from a single activity profile through
+                    emission-factor cascades, composite scoring, z-score anomaly detection, and
+                    compounding scenario projection. No values are hard-coded.
+                  </p>
                 </div>
-                <h1 className="text-balance font-sans text-xl font-semibold tracking-tight text-foreground md:text-2xl">
-                  Personal ESG Intelligence — Deterministic Carbon Ledger
-                </h1>
-                <p className="max-w-2xl text-pretty text-sm leading-relaxed text-muted-foreground">
-                  Every figure below is derived from a single activity profile through
-                  emission-factor cascades, composite scoring, z-score anomaly detection, and
-                  compounding scenario projection. No values are hard-coded.
-                </p>
-              </div>
-            </FadeIn>
+              </FadeIn>
 
-            <FadeIn delay={0.1}>
-              <DataEntryPanel />
-            </FadeIn>
+              <FadeIn delay={0.1}>
+                <DataEntryPanel />
+              </FadeIn>
+            </div>
 
             <FadeIn delay={0.2}>
               <div id="inventory" className="scroll-mt-24">
