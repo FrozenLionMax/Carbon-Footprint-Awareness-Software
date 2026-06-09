@@ -21,8 +21,7 @@ export const navItems = [
   { label: "Inventory", icon: Layers, code: "002", id: "inventory" },
   { label: "Scope Ledger", icon: ScrollText, code: "003", id: "ledger" },
   { label: "Anomalies", icon: Radar, code: "004", id: "anomalies" },
-  { label: "Scenarios", icon: GitBranch, code: "005", id: "scenarios" },
-  { label: "Abatement", icon: FlaskConical, code: "006", id: "abatement" },
+  { label: "Simulations", icon: GitBranch, code: "005", id: "scenarios" },
 ]
 
 export function DashboardSidebar() {
@@ -56,7 +55,10 @@ export function DashboardSidebar() {
   const scrollTo = (id: string) => {
     const el = document.getElementById(id)
     if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" })
+      // Calculate exact mathematical scroll target to avoid scrollIntoView jumpiness
+      // and explicitly account for the 64px sticky header + 24px padding margin.
+      const y = el.getBoundingClientRect().top + window.scrollY - 100
+      window.scrollTo({ top: y, behavior: "smooth" })
     }
   }
 
