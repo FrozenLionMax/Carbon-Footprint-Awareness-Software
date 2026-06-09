@@ -11,7 +11,7 @@ import {
   TerminalSquare,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useCarbonContext } from "@/lib/context"
 import { budgetStatus } from "@/lib/dashboard-data"
 import { motion } from "framer-motion"
@@ -25,6 +25,9 @@ export const navItems = [
 
 export function DashboardSidebar() {
   const [activeSection, setActiveSection] = useState("terminal")
+  const isClickScrolling = useRef(false)
+  const clickScrollTimeout = useRef<NodeJS.Timeout | null>(null)
+  
   const { profile } = useCarbonContext()
   const budget = budgetStatus(profile)
 
@@ -66,6 +69,15 @@ export function DashboardSidebar() {
 
     let ticking = false
     const onScroll = () => {
+      // If we are programmatically scrolling via a click, wait for it to settle
+      if (isClickScrolling.current) {
+        if (clickScrollTimeout.current) clearTimeout(clickScrollTimeout.current)
+        clickScrollTimeout.current = setTimeout(() => {
+          isClickScrolling.current = false
+        }, 100)
+        return
+      }
+
       if (!ticking) {
         window.requestAnimationFrame(() => {
           handleScroll()
@@ -85,8 +97,16 @@ export function DashboardSidebar() {
   }, [])
 
   const scrollTo = (id: string) => {
-    setActiveSection(id) // Immediately update UI for instant feedback
-    const el = document.getElementById(id)
+      isClickScrolling.current = true
+      setActiveSection(id) // Immediately update UI for instant feedback
+      
+      // Fallback timeout in case smooth scroll never fires onScroll (e.g. already at destination)
+      if (clickScrollTimeout.current) clearTimeout(clickScrollTimeout.current)
+      clickScrollTimeout.current = setTimeout(() => {
+        isClickScrolling.current = false
+      }, 1000)
+
+      const el = document.getElementById(id)
     if (el) {
       // Calculate exact mathematical scroll target to avoid scrollIntoView jumpiness
       // Use 120px offset to aggressively clear the sticky header and give visual breathing room
