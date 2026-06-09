@@ -14,12 +14,23 @@ import { useCarbonContext } from "@/lib/context"
 import { ambientDrone, hapticAudio } from "@/lib/audio"
 import { MobileNav } from "@/components/mobile-nav"
 import { ExportPdfButton } from "@/components/ui/export-pdf-button"
+import { budgetStatus } from "@/lib/dashboard-data"
 
 export function DashboardHeader() {
   const { fy, setFy, profile } = useCarbonContext()
   const [clock, setClock] = useState("--:--:--")
   const [droneEnabled, setDroneEnabled] = useState(false)
   const [placeholder, setPlaceholder] = useState("")
+  
+  const budget = budgetStatus(profile, fy)
+  const ratio = budget.overshootRatio
+  let grade = "A+"
+  let gradeColor = "text-green-500 border-green-500/50 bg-green-500/10 shadow-[0_0_15px_rgba(34,197,94,0.4)]"
+  if (ratio > 1.0) { grade = "A"; gradeColor = "text-green-400 border-green-400/40 bg-green-400/10 shadow-[0_0_15px_rgba(74,222,128,0.3)]" }
+  if (ratio > 2.5) { grade = "B"; gradeColor = "text-yellow-400 border-yellow-400/40 bg-yellow-400/10 shadow-[0_0_15px_rgba(250,204,21,0.3)]" }
+  if (ratio > 4.0) { grade = "C"; gradeColor = "text-orange-400 border-orange-400/40 bg-orange-400/10 shadow-[0_0_15px_rgba(251,146,60,0.3)]" }
+  if (ratio > 6.0) { grade = "D"; gradeColor = "text-red-400 border-red-400/40 bg-red-400/10 shadow-[0_0_15px_rgba(248,113,113,0.3)]" }
+  if (ratio > 8.0) { grade = "F"; gradeColor = "text-red-600 border-red-600/50 bg-red-600/10 shadow-[0_0_20px_rgba(220,38,38,0.5)] animate-pulse" }
 
   useEffect(() => {
     const prompts = [
@@ -112,6 +123,9 @@ export function DashboardHeader() {
       </div>
 
       <div className="ml-auto flex items-center gap-3 md:gap-4">
+        <div className={`hidden sm:flex items-center justify-center size-8 rounded-full border-2 font-black text-sm tracking-tighter ${gradeColor} transition-all duration-500`} title="ESG Grade">
+          {grade}
+        </div>
         <div className="hidden items-center gap-2 font-mono text-xs text-muted-foreground sm:flex">
           <div className="relative flex size-2 items-center justify-center">
             <span className="absolute inset-0 rounded-full bg-accent animate-ping opacity-75" />

@@ -13,13 +13,15 @@ import { DataEntryPanel } from "@/components/data-entry-panel"
 import { FadeIn } from "@/components/ui/fade-in"
 import { AIBriefingPanel } from "@/components/ai-briefing-panel"
 import { TelemetryTerminal } from "@/components/telemetry-terminal"
+import { AmbientBackground } from "@/components/ambient-background"
 import { useState } from "react"
 
 export default function Page() {
   const [isSyncing, setIsSyncing] = useState(false)
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
+    <div className="flex min-h-screen bg-background text-foreground relative z-0">
+      <AmbientBackground />
       <AIBriefingPanel />
       <TelemetryTerminal isOpen={isSyncing} onComplete={() => setIsSyncing(false)} />
       <DashboardSidebar />
