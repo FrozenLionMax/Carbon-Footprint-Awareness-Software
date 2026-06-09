@@ -41,14 +41,15 @@ export function ExportPdfButton() {
     <button
       onClick={handleExport}
       disabled={isExporting}
-      className="flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold tracking-wide text-muted-foreground backdrop-blur-md transition-all hover:bg-white/10 hover:text-foreground hover:shadow-[0_0_15px_var(--color-primary-alpha-20)] disabled:cursor-not-allowed disabled:opacity-50 print:hidden"
+      className="group relative overflow-hidden flex items-center gap-2.5 rounded-md bg-gradient-to-r from-primary to-primary/80 px-5 py-2.5 text-sm font-bold tracking-wide text-primary-foreground shadow-lg shadow-primary/30 ring-1 ring-primary/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 print:hidden"
     >
       {isExporting ? (
         <Loader2 className="size-4 animate-spin" />
       ) : (
-        <Download className="size-4" />
+        <Download className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5" />
       )}
-      <span>Download Executive Report</span>
+      <span className="relative z-10">Download Executive Report</span>
+      <div className="absolute inset-0 -translate-x-[150%] bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-in-out group-hover:translate-x-[150%]" />
     </button>
   )
 }
