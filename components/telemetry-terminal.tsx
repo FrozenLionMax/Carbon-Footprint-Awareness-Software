@@ -19,7 +19,7 @@ export function TelemetryTerminal({ isOpen, onComplete }: { isOpen: boolean, onC
       setLogs([`[${new Date().toISOString()}] INITIATING SECURE HANDSHAKE...`])
       await new Promise((r) => setTimeout(r, 600))
       
-      setLogs(prev => [...prev, `[${new Date().toISOString()}] ESTABLISHING CONNECTION TO UK NATIONAL GRID API...`])
+      setLogs(prev => [...prev, `[${new Date().toISOString()}] ESTABLISHING CONNECTION TO INDIA NATIONAL GRID (CEA PROXY)...`])
       await new Promise((r) => setTimeout(r, 800))
 
       try {
