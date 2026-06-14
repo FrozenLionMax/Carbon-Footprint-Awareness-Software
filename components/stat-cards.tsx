@@ -1,6 +1,6 @@
 "use client"
 
-import { computeScores, budgetStatus, totalAnnualKg, emissionsByScope } from "@/lib/dashboard-data"
+import { computeScores, budgetStatus, totalAnnualKg, emissionsByScope, monthlyTrend } from "@/lib/dashboard-data"
 import { ArrowDownRight, ArrowUpRight, Flame, Gauge, Globe2, ShieldCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useCarbonContext } from "@/lib/context"
@@ -19,15 +19,25 @@ export function StatCards() {
   const totalKg = totalAnnualKg(profile, fy)
   const scope3Share = totalKg > 0 ? Math.round((scope.scope3 / totalKg) * 100) : 0
 
+  // Calculate real Month-over-Month delta from the trend engine
+  const trend = monthlyTrend(profile, fy)
+  const lastMonth = trend[trend.length - 1]
+  const prevMonth = trend[trend.length - 2]
+  const lastTotal = lastMonth.scope1 + lastMonth.scope2 + lastMonth.scope3
+  const prevTotal = prevMonth.scope1 + prevMonth.scope2 + prevMonth.scope3
+  const momDelta = prevTotal > 0 ? ((lastTotal - prevTotal) / prevTotal) * 100 : 0
+  const momGood = momDelta <= 0
+  const isWithinBudget = budget.overshootRatio <= 1
+
   const cards = [
     {
       label: "Annual footprint",
       value: <AnimatedNumber value={annualT} decimals={1} />,
       unit: "tCO₂e / yr",
       icon: Flame,
-      delta: "−0.9% MoM",
-      good: true,
-      sub: `${fmt(Math.round(totalAnnualKg(profile)))} kg modelled`,
+      delta: `${momGood ? "−" : "+"}${Math.abs(Math.round(momDelta * 10) / 10)}% MoM`,
+      good: momGood,
+      sub: `${fmt(Math.round(totalAnnualKg(profile, fy)))} kg modelled`,
     },
     {
       label: "ESG composite",
@@ -43,8 +53,8 @@ export function StatCards() {
       value: <AnimatedNumber value={budget.overshootRatio} decimals={2} suffix="×" />,
       unit: "vs 1.5°C allowance",
       icon: Gauge,
-      delta: `+${Math.round(budget.overshootPct)}% over`,
-      good: false,
+      delta: isWithinBudget ? "Within budget" : `+${Math.round(budget.overshootPct)}% over`,
+      good: isWithinBudget,
       sub: `allowance ${fmt(Math.round(budget.allowanceKg))} kg`,
     },
     {
@@ -53,13 +63,18 @@ export function StatCards() {
       unit: "if globally scaled",
       icon: Globe2,
       delta: `budget burns day ${budget.budgetExhaustedDay}`,
-      good: false,
+      good: isWithinBudget,
       sub: `Scope 3 = ${scope3Share}% of total`,
     },
   ]
 
   return (
-    <div className="grid grid-cols-1 gap-px overflow-hidden rounded-sm border border-white/5 bg-border/50 backdrop-blur-xl shadow-2xl shadow-black/40 sm:grid-cols-2 xl:grid-cols-4">
+    <div 
+      className="grid grid-cols-1 gap-px overflow-hidden rounded-sm border border-white/5 bg-border/50 backdrop-blur-xl shadow-2xl shadow-black/40 sm:grid-cols-2 xl:grid-cols-4"
+      role="region"
+      aria-label="Key performance indicators"
+      aria-live="polite"
+    >
       {cards.map((c) => {
         const Delta = c.good ? ArrowDownRight : ArrowUpRight
         return (

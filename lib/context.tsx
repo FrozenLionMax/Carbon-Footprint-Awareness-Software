@@ -18,17 +18,25 @@ interface CarbonContextType {
   fetchLiveTelemetry: () => Promise<void>
   isLive: boolean
   liveIntensity: number | null
+  userName: string
+  setUserName: (name: string) => void
+  userTitle: string
+  setUserTitle: (title: string) => void
+  resetKey: number
 }
 
 const CarbonContext = createContext<CarbonContextType | undefined>(undefined)
 
 export function CarbonProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<ActivityProfile>(defaultProfile)
+  const [resetKey, setResetKey] = useState(0)
   const [levers, setLevers] = useState<ScenarioLevers>(DEFAULT_LEVERS)
   const [fy, setFy] = useState<number>(2025)
   const [isLoaded, setIsLoaded] = useState(false)
   const [isLive, setIsLive] = useState(false)
   const [liveIntensity, setLiveIntensity] = useState<number | null>(null)
+  const [userName, setUserName] = useState("System Profile")
+  const [userTitle, setUserTitle] = useState("Primary User")
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -42,6 +50,11 @@ export function CarbonProvider({ children }: { children: React.ReactNode }) {
         console.error("Failed to parse saved profile", e)
       }
     }
+    const savedName = localStorage.getItem("carbonLedgerName_v2")
+    if (savedName) setUserName(savedName)
+    const savedTitle = localStorage.getItem("carbonLedgerTitle_v2")
+    if (savedTitle) setUserTitle(savedTitle)
+    
     setIsLoaded(true)
   }, [])
 
@@ -49,8 +62,10 @@ export function CarbonProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem("carbonLedgerProfile", JSON.stringify(profile))
+      localStorage.setItem("carbonLedgerName_v2", userName)
+      localStorage.setItem("carbonLedgerTitle_v2", userTitle)
     }
-  }, [profile, isLoaded])
+  }, [profile, userName, userTitle, isLoaded])
 
   // Bio-Feedback Theme Engine
   useEffect(() => {
@@ -107,6 +122,8 @@ export function CarbonProvider({ children }: { children: React.ReactNode }) {
 
   const resetProfile = () => {
     setProfile(defaultProfile)
+    setResetKey(k => k + 1)
+    localStorage.removeItem("carbonLedgerProfile")
   }
 
   const randomizeProfile = () => {
@@ -155,7 +172,7 @@ export function CarbonProvider({ children }: { children: React.ReactNode }) {
       
       // Simulate network latency
       await new Promise(r => setTimeout(r, 600))
-        
+      
       // Dynamic import to avoid circular dependency issues and directly call the setter
       const { setEmissionFactor } = await import("./dashboard-data")
       setEmissionFactor("electricityKwh", kgIntensity)
@@ -172,7 +189,7 @@ export function CarbonProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <CarbonContext.Provider value={{ profile, updateProfile, resetProfile, randomizeProfile, levers, toggleLever, fy, setFy, fetchLiveTelemetry, isLive, liveIntensity }}>
+    <CarbonContext.Provider value={{ profile, updateProfile, resetProfile, randomizeProfile, levers, toggleLever, fy, setFy, fetchLiveTelemetry, isLive, liveIntensity, userName, setUserName, userTitle, setUserTitle, resetKey }}>
       {children}
     </CarbonContext.Provider>
   )

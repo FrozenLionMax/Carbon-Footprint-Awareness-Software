@@ -19,7 +19,25 @@ export const metadata: Metadata = {
   title: 'CARBON·LEDGER — Personal ESG Intelligence Terminal',
   description:
     'A deterministic sustainability terminal: composite ESG scoring, carbon-budget depletion modeling, anomaly detection, and 10-year scenario projection.',
-  generator: 'v0.app',
+  keywords: [
+    'carbon footprint',
+    'ESG scoring',
+    'sustainability',
+    'climate change',
+    'GHG protocol',
+    'carbon calculator',
+    'Paris Agreement',
+    'net zero',
+    'emission tracking',
+  ],
+  authors: [{ name: 'Carbon Ledger Contributors' }],
+  openGraph: {
+    title: 'CARBON·LEDGER — Personal ESG Intelligence Terminal',
+    description:
+      'Track, analyze, and reduce your personal carbon footprint with deterministic ESG scoring and 10-year scenario projection.',
+    type: 'website',
+    locale: 'en_US',
+  },
   icons: {
     icon: [
       {

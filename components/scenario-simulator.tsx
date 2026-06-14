@@ -116,6 +116,7 @@ export function ScenarioSimulator() {
                     toggleLever(lever.key)
                   }}
                   aria-pressed={active}
+                  aria-label={`${lever.label}: ${active ? 'active' : 'inactive'}. ${lever.note}`}
                   className={cn(
                     "group flex items-center gap-3 px-5 py-3 text-left transition-all duration-300 hover:bg-muted/60 hover:pl-6 active:scale-[0.98]",
                     active && "bg-primary/5",
@@ -195,7 +196,7 @@ export function ScenarioSimulator() {
                 <AnimatedNumber value={result.totalCapEx} decimals={0} prefix="$" />
               </p>
             </div>
-            <div className="bg-card px-5 py-3">
+            <div className="bg-card/0 px-5 py-3">
               <p className="font-mono text-[10px] uppercase tracking-terminal text-muted-foreground">
                 Annual Savings
               </p>

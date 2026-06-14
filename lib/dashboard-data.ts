@@ -5,9 +5,14 @@
 // Units: kgCO2e unless noted. tCO2e = kg / 1000.
 // ============================================================================
 
+/** GHG Protocol emission scope classification */
 export type Scope = "scope1" | "scope2" | "scope3"
 
-// --- Emission factors (kgCO2e per activity unit) --------------------------
+/**
+ * Emission factors (kgCO₂e per activity unit).
+ * Sources: IPCC AR6, DEFRA 2023, EPA eGRID.
+ * Mutable to allow live telemetry overrides.
+ */
 export let EMISSION_FACTORS = {
   electricityKwh: 0.233, // grid electricity, kg/kWh
   naturalGasKwh: 0.183, // heating, kg/kWh
@@ -20,6 +25,12 @@ export let EMISSION_FACTORS = {
   goodsSpendUsd: 0.45, // embodied carbon per $ of goods
 }
 
+/**
+ * Overrides a single emission factor at runtime.
+ * Used by the live telemetry engine to inject real grid carbon intensity.
+ * @param key - The emission factor to override
+ * @param value - New value in kgCO₂e per unit
+ */
 export function setEmissionFactor(key: keyof typeof EMISSION_FACTORS, value: number) {
   EMISSION_FACTORS[key] = value
 }
@@ -49,38 +60,65 @@ export const FACTOR_KEY: Record<keyof typeof EMISSION_FACTORS, keyof typeof EMIS
 }
 
 // --- Baseline annual activity profile (the single source of truth) --------
+// Calibrated for an average urban Indian individual's carbon footprint.
 export const activityProfile = {
-  // Emissions Activity
-  electricityKwh: 4200,
-  naturalGasKwh: 9800,
-  petrolLitre: 920,
-  flightShortHaulKm: 3400,
-  flightLongHaulKm: 11200,
-  redMeatKg: 38,
-  dairyKg: 110,
-  plantKg: 240,
-  goodsSpendUsd: 9600,
+  // Emissions Activity (annual)
+  electricityKwh: 1200,       // avg Indian household: ~1200 kWh/yr
+  naturalGasKwh: 1800,        // LPG/piped gas cooking equivalent
+  petrolLitre: 420,           // ~35L/month two-wheeler + occasional car
+  flightShortHaulKm: 1200,    // ~2 domestic round trips/yr
+  flightLongHaulKm: 0,        // most Indians don't fly international yearly
+  redMeatKg: 12,              // low — India is 70%+ vegetarian-leaning
+  dairyKg: 110,               // high — India is world's largest dairy consumer
+  plantKg: 240,               // staple diet: rice, lentils, vegetables
+  goodsSpendUsd: 2400,        // ~₹200k/yr on goods & services
   // ESG Governance Metrics
-  renewableSharePct: 64,
-  wasteDiversionPct: 78,
-  supplierTransparencyPct: 52,
-  dataCompletenessPct: 91,
-  offsetCoveragePct: 18,
+  renewableSharePct: 30,      // India's grid is ~30% renewable (2025)
+  wasteDiversionPct: 40,      // urban waste segregation is still growing
+  supplierTransparencyPct: 25, // individual-level supply chain awareness
+  dataCompletenessPct: 60,    // typical self-reported data coverage
+  offsetCoveragePct: 5,       // very few individuals offset in India
 }
 
-// Utilities
-export const safeNumber = (v: any) => (typeof v === "number" && !isNaN(v) ? v : 0)
-export const round = (v: number, decimals = 0) => Number(Math.round(Number(`${safeNumber(v)}e${decimals}`)) + `e-${decimals}`)
-export const avg = (arr: number[]) => arr.reduce((a, b) => safeNumber(a) + safeNumber(b), 0) / (arr.length || 1)
-export const stdev = (arr: number[]) => {
+// --- Pure Utility Functions ------------------------------------------------
+
+/** Safely coerces any value to a number, returning 0 for NaN/null/undefined */
+export const safeNumber = (v: any): number => (typeof v === "number" && !isNaN(v) ? v : 0)
+
+/** Rounds a number to the specified decimal places using exponential notation */
+export const round = (v: number, decimals = 0): number => Number(Math.round(Number(`${safeNumber(v)}e${decimals}`)) + `e-${decimals}`)
+
+/** Computes the arithmetic mean of an array, returning 0 for empty arrays */
+export const avg = (arr: number[]): number => arr.reduce((a, b) => safeNumber(a) + safeNumber(b), 0) / (arr.length || 1)
+
+/** Computes the population standard deviation of an array */
+export const stdev = (arr: number[]): number => {
   const m = avg(arr);
   return Math.sqrt(arr.map(x => Math.pow(safeNumber(x) - m, 2)).reduce((a, b) => a + b, 0) / (arr.length || 1));
 }
-export const clamp = (v: number, min = 0, max = 100) => Math.min(Math.max(safeNumber(v), min), max)
-export const scopeLabel = (s: string) => s.replace("scope", "Scope ")
+
+/** Clamps a value between min and max bounds (default 0–100) */
+export const clamp = (v: number, min = 0, max = 100): number => Math.min(Math.max(safeNumber(v), min), max)
+
+/** Formats a scope key (e.g., 'scope1') into a human-readable label ('Scope 1') */
+export const scopeLabel = (s: string): string => s.replace("scope", "Scope ")
+
+/**
+ * Calculates the percentage of a part relative to a total.
+ * Returns 0 if the total is 0 to prevent division-by-zero.
+ */
 export const pct = (part: number, total: number) => (total > 0 ? round((safeNumber(part) / safeNumber(total)) * 100, 1) : 0)
 
-// --- Core derivation: activity -> emissions --------------------------------
+// --- Core derivation: activity → emissions --------------------------------
+
+/**
+ * Applies historical scaling factors to a profile for a given fiscal year.
+ * FY2024 = 1.08×, FY2023 = 1.15× (higher historical emissions).
+ * Also regresses renewable and waste metrics for past years.
+ * @param profile - The base activity profile
+ * @param fy - Fiscal year (2023–2025)
+ * @returns A scaled copy of the profile
+ */
 export function getScaledProfile(profile = activityProfile, fy = 2025) {
   // Apply historical scaling factors. e.g. FY23 had worse renewable share and higher intensity.
   const scale = fy === 2024 ? 1.08 : fy === 2023 ? 1.15 : 1.0;
@@ -100,6 +138,11 @@ export function getScaledProfile(profile = activityProfile, fy = 2025) {
   return p;
 }
 
+/**
+ * Computes emissions for each activity type using emission-factor cascade.
+ * Each activity value is multiplied by its corresponding kgCO₂e factor.
+ * @returns Array of { key, scope, kg } objects
+ */
 export function emissionsByActivity(baseProfile = activityProfile, fy = 2025) {
   const profile = getScaledProfile(baseProfile, fy);
   const keys: (keyof typeof EMISSION_FACTORS)[] = [
@@ -113,6 +156,7 @@ export function emissionsByActivity(baseProfile = activityProfile, fy = 2025) {
   }))
 }
 
+/** Aggregates emissions by GHG Protocol scope (1, 2, 3) */
 export function emissionsByScope(profile = activityProfile, fy = 2025) {
   const rows = emissionsByActivity(profile, fy)
   const acc: Record<Scope, number> = { scope1: 0, scope2: 0, scope3: 0 }
@@ -120,14 +164,24 @@ export function emissionsByScope(profile = activityProfile, fy = 2025) {
   return acc
 }
 
+/** Returns total annual emissions in kgCO₂e across all three scopes */
 export function totalAnnualKg(profile = activityProfile, fy = 2025) {
   const s = emissionsByScope(profile, fy)
   return s.scope1 + s.scope2 + s.scope3
 }
 
-// --- Carbon budget logic (1.5C aligned personal budget) --------------------
-// Paris-aligned personal allowance trends from ~2.3 tCO2e/yr toward 0 by 2050.
+/**
+ * Paris Agreement 1.5°C per-capita annual carbon budget for 2025.
+ * Derived from IPCC remaining global carbon budget / world population.
+ */
 export const PARIS_BUDGET_2025_KG = 2300
+
+/**
+ * Calculates the Paris Agreement 1.5°C per-capita carbon budget for a given year.
+ * Linear glide path from 2,300 kgCO₂e in 2025 to 0 in 2050.
+ * @param year - The target year (2025–2050)
+ * @returns Annual allowance in kgCO₂e
+ */
 export function budgetForYear(year: number) {
   const start = 2025
   const end = 2050
@@ -135,6 +189,11 @@ export function budgetForYear(year: number) {
   return PARIS_BUDGET_2025_KG * (1 - t) // linear glide path to ~0
 }
 
+/**
+ * Evaluates the current profile against the 1.5°C carbon budget.
+ * @returns Object with annualKg, allowanceKg, overshootRatio, overshootPct,
+ *          budgetExhaustedDay (day of year when budget runs out), earthsRequired
+ */
 export function budgetStatus(profile = activityProfile, fy = 2025) {
   const annual = totalAnnualKg(profile, fy)
   const allowance = budgetForYear(2025)
@@ -168,6 +227,13 @@ export function getPillarInputs(profile = activityProfile, fy = 2025) {
   }
 }
 
+/**
+ * Computes the weighted ESG composite score (0–100) and letter grade.
+ * Environmental (55%): emission intensity + renewable share + offset coverage
+ * Social (20%): waste diversion + supplier transparency
+ * Governance (25%): data completeness + supplier transparency
+ * @returns Object with environmental, social, governance, composite, grade
+ */
 export function computeScores(profile = activityProfile, fy = 2025) {
   const p = getPillarInputs(profile, fy)
   // Environmental: blend of intensity (benchmark 12 tCO2e), renewables, offsets

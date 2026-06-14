@@ -8,7 +8,7 @@ import { useDebounce } from "@/hooks/use-debounce"
 import { hapticAudio } from "@/lib/audio"
 
 export function DataEntryPanel() {
-  const { profile, updateProfile, resetProfile, isLive, liveIntensity } = useCarbonContext()
+  const { profile, updateProfile, resetProfile, isLive, liveIntensity, resetKey } = useCarbonContext()
   const [tab, setTab] = useState<"emissions" | "esg">("emissions")
 
   return (
@@ -22,8 +22,10 @@ export function DataEntryPanel() {
             </h2>
           </div>
           <div className="hidden h-4 w-px bg-border sm:block" />
-          <div className="flex items-center gap-1 bg-muted/50 p-0.5 rounded-sm">
+          <div className="flex items-center gap-1 bg-muted/50 p-0.5 rounded-sm" role="tablist" aria-label="Parameter category">
             <button
+              role="tab"
+              aria-selected={tab === "emissions"}
               onClick={() => { hapticAudio.playToggle(true); setTab("emissions"); }}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm font-mono text-[10px] uppercase tracking-wide transition-all duration-300 ${tab === "emissions" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}
             >
@@ -31,6 +33,8 @@ export function DataEntryPanel() {
               Activity
             </button>
             <button
+              role="tab"
+              aria-selected={tab === "esg"}
               onClick={() => { hapticAudio.playToggle(true); setTab("esg"); }}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm font-mono text-[10px] uppercase tracking-wide transition-all duration-300 ${tab === "esg" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}
             >
@@ -44,16 +48,17 @@ export function DataEntryPanel() {
             hapticAudio.playToggle(false);
             resetProfile();
           }}
-          className="font-mono text-[10px] uppercase tracking-terminal text-muted-foreground transition-all duration-300 hover:text-primary hover:tracking-widest"
+          className="rounded-sm border border-destructive/20 bg-destructive/5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-terminal text-destructive/80 transition-all duration-300 hover:bg-destructive/15 hover:text-destructive hover:border-destructive/40 hover:shadow-sm hover:shadow-destructive/20 active:scale-95"
         >
-          [ Reset Default ]
+          ↺ Reset Default
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-5">
+      <div key={`${resetKey}-${tab}`} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-5">
         {tab === "emissions" ? (
           <>
             <InputField 
+              key="electricityKwh"
               label="Electricity (kWh/yr)" 
               value={profile.electricityKwh} 
               min={0} max={20000} step={100}
@@ -62,48 +67,56 @@ export function DataEntryPanel() {
               badgeType={isLive ? (liveIntensity! > 0.7 ? "red" : liveIntensity! > 0.6 ? "yellow" : "green") : "default"}
             />
             <InputField 
+              key="naturalGasKwh"
               label="Natural Gas (kWh/yr)" 
               value={profile.naturalGasKwh} 
               min={0} max={20000} step={100}
               onChange={(v) => updateProfile("naturalGasKwh", v)} 
             />
             <InputField 
+              key="petrolLitre"
               label="Petrol Vehicle (L/yr)" 
               value={profile.petrolLitre} 
               min={0} max={3000} step={10}
               onChange={(v) => updateProfile("petrolLitre", v)} 
             />
             <InputField 
+              key="flightShortHaulKm"
               label="Short Flights (km/yr)" 
               value={profile.flightShortHaulKm} 
               min={0} max={20000} step={100}
               onChange={(v) => updateProfile("flightShortHaulKm", v)} 
             />
             <InputField 
+              key="flightLongHaulKm"
               label="Long Flights (km/yr)" 
               value={profile.flightLongHaulKm} 
               min={0} max={50000} step={500}
               onChange={(v) => updateProfile("flightLongHaulKm", v)} 
             />
             <InputField 
+              key="redMeatKg"
               label="Red Meat (kg/yr)" 
               value={profile.redMeatKg} 
               min={0} max={200} step={1}
               onChange={(v) => updateProfile("redMeatKg", v)} 
             />
             <InputField 
+              key="dairyKg"
               label="Dairy (kg/yr)" 
               value={profile.dairyKg} 
               min={0} max={500} step={5}
               onChange={(v) => updateProfile("dairyKg", v)} 
             />
             <InputField 
+              key="goodsSpendUsd"
               label="Goods Spend ($/yr)" 
               value={profile.goodsSpendUsd} 
               min={0} max={50000} step={100}
               onChange={(v) => updateProfile("goodsSpendUsd", v)} 
             />
             <InputField 
+              key="plantKg"
               label="Plant-based (kg/yr)" 
               value={profile.plantKg} 
               min={0} max={1000} step={10}
@@ -113,30 +126,35 @@ export function DataEntryPanel() {
         ) : (
           <>
             <InputField 
+              key="renewableSharePct"
               label="Renewable Share (%)" 
               value={profile.renewableSharePct} 
               min={0} max={100} step={1}
               onChange={(v) => updateProfile("renewableSharePct", v)} 
             />
             <InputField 
+              key="wasteDiversionPct"
               label="Waste Diversion (%)" 
               value={profile.wasteDiversionPct} 
               min={0} max={100} step={1}
               onChange={(v) => updateProfile("wasteDiversionPct", v)} 
             />
             <InputField 
+              key="supplierTransparencyPct"
               label="Supplier Transparency (%)" 
               value={profile.supplierTransparencyPct} 
               min={0} max={100} step={1}
               onChange={(v) => updateProfile("supplierTransparencyPct", v)} 
             />
             <InputField 
+              key="dataCompletenessPct"
               label="Data Completeness (%)" 
               value={profile.dataCompletenessPct} 
               min={0} max={100} step={1}
               onChange={(v) => updateProfile("dataCompletenessPct", v)} 
             />
             <InputField 
+              key="offsetCoveragePct"
               label="Offset Coverage (%)" 
               value={profile.offsetCoveragePct} 
               min={0} max={100} step={1}
@@ -185,6 +203,7 @@ function InputField({ label, value, min, max, step, onChange, badge, badgeType =
         </div>
         <input
           type="number"
+          aria-label={label}
           value={localValue === 0 ? "0" : localValue || ""}
           min={min}
           max={max}
@@ -206,6 +225,7 @@ function InputField({ label, value, min, max, step, onChange, badge, badgeType =
         />
       </div>
       <Slider 
+        aria-label={label}
         value={[localValue ?? 0]}
         min={min}
         max={max}

@@ -39,7 +39,11 @@ export function Recommendations() {
           size="sm" 
           className="gap-1 rounded-sm text-primary hover:text-primary"
           onClick={() => {
-            document.getElementById("scenarios")?.scrollIntoView({ behavior: "smooth", block: "start" })
+            const el = document.getElementById("scenarios")
+            if (el) {
+              const y = el.getBoundingClientRect().top + window.scrollY - 120
+              window.scrollTo({ top: y, behavior: "smooth" })
+            }
           }}
         >
           Model

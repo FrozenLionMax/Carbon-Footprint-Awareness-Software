@@ -1,6 +1,6 @@
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
 import { ActivityProfile } from '@/lib/context';
-import { emissionsByActivity, budgetStatus, EMISSION_FACTORS } from '@/lib/dashboard-data';
+import { emissionsByScope, totalAnnualKg, budgetStatus, EMISSION_FACTORS, getScaledProfile } from '@/lib/dashboard-data';
 
 const styles = StyleSheet.create({
   page: {
@@ -96,9 +96,11 @@ const styles = StyleSheet.create({
   }
 });
 
-export const PdfReportDocument = ({ profile, fy, isLive }: { profile: ActivityProfile, fy: number, isLive: boolean }) => {
-  const { scope1, scope2, scope3, total } = emissionsByActivity(profile);
-  const budget = budgetStatus(profile, fy);
+export const PdfReportDocument = ({ profile: baseProfile, fy, isLive }: { profile: ActivityProfile, fy: number, isLive: boolean }) => {
+  const { scope1, scope2, scope3 } = emissionsByScope(baseProfile, fy);
+  const total = totalAnnualKg(baseProfile, fy);
+  const profile = getScaledProfile(baseProfile, fy);
+  const budget = budgetStatus(baseProfile, fy);
 
   return (
     <Document>
